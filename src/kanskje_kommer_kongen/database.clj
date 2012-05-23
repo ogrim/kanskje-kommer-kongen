@@ -13,7 +13,6 @@
 (defn create-tables []
   (do
     (sql/create-table "program"
-;                      [:id :int ]
                       [:tittel :text]
                       [:tekst :text]
                       [:dato :datetime]
@@ -38,24 +37,6 @@
 (defentity program
   (table :program)
   (entity-fields :tittel :tekst :dato :klokkeslett :fra :til))
-
-(comment (defn insert-program [{:keys [dato klokkeslett dato-intervall tittel tekst]}]
-   (let [fra (if (nil? dato-intervall) nil (c/to-timestamp (t/start dato-intervall)))
-         til (if (nil? dato-intervall) nil (c/to-timestamp (t/end dato-intervall)))]
-
-     (let [s (sql-only  (insert program (values {:tittel tittel
-                                                 :tekst tekst
-                                                 :dato (c/to-timestamp dato)
-                                                 :klokkeslett klokkeslett
-                                                 :fra fra
-                                                 :til til})))
-           z{:tittel tittel
-             :tekst tekst
-             :dato (c/to-timestamp dato)
-             :klokkeslett klokkeslett
-             :fra fra
-             :til til} ] [s z])
-     )))
 
 (defn insert-program [{:keys [dato klokkeslett dato-intervall tittel tekst]}]
   (let [fra (if (nil? dato-intervall) nil (c/to-timestamp (t/start dato-intervall)))

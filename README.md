@@ -1,15 +1,13 @@
 # kanskje-kommer-kongen
 
-I'm an app. Or maybe I'm a library? I haven't decided yet. 
-
-The choice is up to you!
+Hvor er kongen?
 
 ## Usage
 
-FIXME
+
 
 ## License
 
-Copyright © 2012 FIXME
+Copyright © 2012 Aleksander Skjæveland Larsen
 
 Distributed under the Eclipse Public License, the same as Clojure.
