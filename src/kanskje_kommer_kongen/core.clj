@@ -6,12 +6,12 @@
   (:import [java.net URL]
            [java.io InputStreamReader]))
 
-(def kalender-url "http://www.kongehuset.no/c26946/kalenderpost/liste.html?sortering=dato&&arkiv=&ar=2012")
+(def ^:private kalender-url "http://www.kongehuset.no/c26946/kalenderpost/liste.html?sortering=dato&&arkiv=&ar=2012")
 
-(defn get-as [url encoding]
+(defn- get-as [url encoding]
   (-> url URL. .getContent (InputStreamReader. encoding) e/html-resource))
 
-(def titler
+(def ^:private titler
   ["DD.MM. Kongen og Dronningen"
    "H.K.H. Kronprinsessen"
    "DD.KK.HH. Kronprinsen og Kronprinsessen"
@@ -19,7 +19,7 @@
    "H.M. Kongen"
    "H.K.H. Kronprinsen"])
 
-(def months
+(def ^:private months
   '{:januar 1
     :februar 2
     :april 3
@@ -33,30 +33,29 @@
     :november 11
     :desember 12})
 
-(defn intervall [fra til m year]
+(defn- intervall [fra til m year]
   (t/interval
-   (t/date-time year (get months (keyword m)) (Integer/parseInt (first (str/split fra #"[.]"))))
-   (t/date-time year (get months (keyword m)) (Integer/parseInt (first (str/split til #"[.]"))))))
+   (t/date-time year (get months (keyword m)) (-> fra (str/split #"[.]") first Integer/parseInt))
+   (t/date-time year (get months (keyword m)) (-> til (str/split #"[.]") first Integer/parseInt))))
 
-(defn finn-dato [tekst year]
+(defn- finn-dato [tekst year]
   (let [datoer (re-seq #"[0-9]{2}[.]?" tekst)]
-    (if (and (= (count datoer) 2) (every? #(= (last %) \.) datoer))
+    (if (and (= (count datoer) 2) (every? (comp (partial = \.) last) datoer))
       (let [[fra til] datoer
-            m (re-find #"\w+" (second (str/split tekst (re-pattern til))))]
+            m (re-find #"\w+" (->> til re-pattern (str/split tekst) second))]
         (intervall fra til m year)))))
 
-(defn finn-klokkeslett [tekst]
+(defn- finn-klokkeslett [tekst]
   (let [klokkeslett (first (re-seq #"[0-9]{2}?[:.]++[0-9]{2}?" tekst))]
     (if (seq klokkeslett) (->> (str/split klokkeslett #"[:.]") (interpose ":") (apply str)))))
 
-(defn parser [node]
+(defn- parser [node]
   (let [[day month year] (map #(Integer/parseInt %)
                               (-> (e/select node [:div.searchEntryDate])
                                   first
                                   :content
                                   first
-                                  (str/split #"[.]")
-                                  ))
+                                  (str/split #"[.]")))
         tekst (-> (e/select node [:div.searchEntryText]) first :content first)
         tittel (-> (e/select node [:div.searchEntryTitle :b]) first :content first)]
     {:dato (t/date-time year month day)
