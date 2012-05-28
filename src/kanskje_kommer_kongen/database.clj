@@ -13,6 +13,7 @@
 (defn- create-tables []
   (do
     (sql/create-table "program"
+                      [:nth :int]
                       [:tittel :text]
                       [:tekst :text]
                       [:dato :datetime]
@@ -31,7 +32,14 @@
 
 (defentity program
   (table :program)
-  (entity-fields :tittel :tekst :dato :klokkeslett :fra :til))
+  (entity-fields :nth :tittel :tekst :dato :klokkeslett :fra :til))
+
+(defn- next-nth []
+  (-> (select program
+        (fields :nth)
+        (order :nth :DESC)
+        (limit 1))
+      first :nth inc))
 
 (defn- can-insert? [tittel dato klokkeslett]
   (empty? (select program
@@ -44,7 +52,8 @@
         til (if (nil? dato-intervall) nil (c/to-timestamp (t/end dato-intervall)))
         sql-dato (c/to-timestamp dato)]
     (if (can-insert? tittel sql-dato klokkeslett)
-      (insert program (values {:tittel tittel
+      (insert program (values {:nth (next-nth)
+                               :tittel tittel
                                :tekst tekst
                                :dato sql-dato
                                :klokkeslett klokkeslett
