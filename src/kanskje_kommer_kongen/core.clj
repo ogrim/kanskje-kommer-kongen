@@ -64,6 +64,12 @@
      :tittel tittel
      :tekst tekst}))
 
-(defn process []
+(defn- sett-inn-nye []
   (->> (e/select (get-as kalender-url "ISO-8859-1") [:div#middleContent :div.searchEntryMiddle])
        (map (comp db/insert-program parser))))
+
+(defn process []
+  (let [nye (->> (sett-inn-nye) (remove nil?) count)]
+    (cond (= nye 0) "Ingen nye hendelser"
+          (= nye 1) "1 ny hendelse"
+          :else  (str nye " nye hendelser"))))

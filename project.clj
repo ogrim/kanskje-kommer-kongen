@@ -8,4 +8,7 @@
                  [enlive "1.0.0"]
                  [clj-time "0.4.2"]
                  [org.clojars.ogrim/korma "0.3.0-beta10"]
-                 [org.xerial/sqlite-jdbc "3.7.2"]])
+                 [org.xerial/sqlite-jdbc "3.7.2"]
+                 [org.clojars.doo/postal "1.8-SNAPSHOT"]
+                 [overtone/at-at "1.0.0"]
+                 [clj-logging-config "1.9.7"]])
