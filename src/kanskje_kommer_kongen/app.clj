@@ -1,8 +1,13 @@
 (ns kanskje-kommer-kongen.app
-  (:use [kanskje-kommer-kongen.core]
-        [overtone.at-at]
+  (:require [kanskje-kommer-kongen [core :as c] [database :as db]])
+  (:use [overtone.at-at]
         [clj-logging-config.log4j]
-        [clojure.tools.logging]))
+        [clojure.tools.logging]
+        [ring.adapter.jetty]
+        [ring.middleware resource reload file params]
+        [ring.util.response]
+        [net.cgrand.moustache])
+  (:gen-class :main true))
 
 (def the-pool (mk-pool))
 
@@ -37,3 +42,17 @@
 
 (defn hours [h]
   (* h 60 60 1000))
+
+(def routes
+  (app
+   (wrap-file "resources")
+   [""] (delegate view-start-page)
+
+   ;; fall-through
+   [&] (delegate view-start-page)))
+
+(defn view-start-page [req]
+  (->> (start-page) response))
+
+(defn -main [port]
+  (run-jetty #'routes {:port (Integer/parseInt port) :join? false}))
