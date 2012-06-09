@@ -12,12 +12,13 @@
   (-> url URL. .getContent (InputStreamReader. encoding) e/html-resource))
 
 (def ^:private titler
-  ["DD.MM. Kongen og Dronningen"
-   "H.K.H. Kronprinsessen"
-   "DD.KK.HH. Kronprinsen og Kronprinsessen"
-   "Deres Majesteter Kongen og Dronningen"
-   "H.M. Kongen"
-   "H.K.H. Kronprinsen"])
+  {"DD.MM. Kongen og Dronningen" [:kongen :dronningen]
+   "H.K.H. Kronprinsessen" [:kronprinsessen]
+   "DD.KK.HH. Kronprinsen og Kronprinsessen" [:kronprinsen :kronprinsessen]
+   "Deres Majesteter Kongen og Dronningen" [:kongen :dronningen]
+   "H.M. Kongen" [:kongen]
+   "H.K.H. Kronprinsen" [:kronprinsen]
+   "H.M. Dronningen" [:dronningen]})
 
 (def ^:private months
   '{:januar 1
@@ -73,3 +74,10 @@
     (cond (= nye 0) "Ingen nye hendelser"
           (= nye 1) "1 ny hendelse"
           :else  (str nye " nye hendelser"))))
+
+(defn- deltakere [{:keys [tekst]}]
+  (->> (keys titler)
+       (map #(re-seq (re-pattern %) tekst))
+       (remove nil?)
+       (mapcat #(get titler (first %)))
+       distinct))
