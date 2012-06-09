@@ -36,11 +36,12 @@
   (entity-fields :nth :tittel :tekst :dato :klokkeslett :fra :til))
 
 (defn- next-nth []
-  (-> (select program
-        (fields :nth)
-        (order :nth :DESC)
-        (limit 1))
-      first :nth inc))
+  (let [current (select program
+                  (fields :nth)
+                  (order :nth :DESC)
+                  (limit 1))]
+    (if (empty? current) 1
+        (-> current first :nth inc))))
 
 (defn- can-insert? [tittel dato klokkeslett]
   (empty? (select program
