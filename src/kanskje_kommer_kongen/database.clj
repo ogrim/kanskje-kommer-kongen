@@ -66,20 +66,25 @@
   (let [dt (l/local-now)]
     (t/date-time (t/year dt) (t/month dt) (t/day dt))))
 
+(defn- to-midnight [dato]
+  (t/date-time (t/year dato) (t/month dato) (t/day dato)))
+
 (defn program-dato
   ([] (program-dato (local-date)))
-  ([#^ReadableDateTime dato] (select program (where (= :dato (c/to-timestamp dato)))))
+  ([#^ReadableDateTime dato]
+     (select program (where (= :dato (c/to-timestamp (to-midnight dato))))))
   ([y m d] (program-dato (t/date-time y m d))))
 
 (defn program-fra
   ([] (program-fra (local-date)))
-  ([#^ReadableDateTime dato] (select program (where (>= :dato (c/to-timestamp dato)))))
+  ([#^ReadableDateTime dato]
+     (select program (where (>= :dato (c/to-timestamp (to-midnight dato))))))
   ([y m d] (program-fra (t/date-time y m d))))
 
 (defn program-fra-til
   ([#^ReadableDateTime fra #^ReadableDateTime til]
-     (select program (where (and (>= :dato (c/to-timestamp fra))
-                                 (<= :dato (c/to-timestamp til))))))
+     (select program (where (and (>= :dato (c/to-timestamp (to-midnight fra)))
+                                 (<= :dato (c/to-timestamp (to-midnight til)))))))
   ([fra-y fra-m fra-d til-y til-m til-d]
      (program-fra-til (t/date-time fra-y fra-m fra-d)
                       (t/date-time til-y til-m til-d))))

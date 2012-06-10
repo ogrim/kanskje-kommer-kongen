@@ -84,3 +84,6 @@
 
 (defn- free-search [{:keys [tekst]} s]
   (if (re-seq (re-pattern (.toLowerCase s)) (.toLowerCase tekst)) true false))
+
+(defn- neste-uke []
+  (db/program-dato (t/plus (t/now) (t/weeks 1))))

@@ -1,6 +1,7 @@
 (ns kanskje-kommer-kongen.app
   (:require [kanskje-kommer-kongen [core :as c] [database :as db]]
-            [postal.core :as post])
+            [postal.core :as post]
+            [clucy.core :as clucy])
   (:use [overtone.at-at]
         [clj-logging-config.log4j]
         [clojure.tools.logging]
@@ -11,6 +12,8 @@
   (:gen-class :main true))
 
 (def the-pool (mk-pool))
+
+(def index (clucy/disk-index "lucene"))
 
 (set-logger! :pattern "%d - %m%n"
              :level :debug
